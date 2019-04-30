@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
  }
 
  private void getDataRetro(){
-   HttpRetro.getCountryClient().getCountries().enqueue(new Callback<List<Country>>(){
+   HttpRetro.getCountryClient().getCountries().enqueue(new Callback<List<Country>>() {
      public void onResponse(Call<List<Country>> call, Response<List<Country>> response){
        if(response.isSuccessful()){
          List<Country> countryBody = response.body();
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
          adapter.notifyDataSetChanged();
        } else{
+
          System.out.println(response.errorBody());
        }
 
