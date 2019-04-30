@@ -1,3 +1,5 @@
+package icomp.ufam.com.schemaps.Base;
+
 import java.io.Serializable;
 
 public class Country implements Serializable{
