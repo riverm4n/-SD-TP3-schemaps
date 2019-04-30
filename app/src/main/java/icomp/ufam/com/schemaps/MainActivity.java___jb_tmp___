@@ -1,5 +1,6 @@
 package icomp.ufam.com.schemaps;
 
+import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,10 @@ import java.util.Random;
 
 import icomp.ufam.com.schemaps.Adapter.Adapter;
 import icomp.ufam.com.schemaps.Base.Country;
+import icomp.ufam.com.schemaps.util.HttpRetro;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
   private Adapter adapter;
@@ -35,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     listPaises = new ArrayList<Country>();
     adapter    = new Adapter(this, listPaises);
 
-    getData();
+    getDataRetro();
 
     listView.setAdapter(adapter);
     //Ações ao clicar:
@@ -47,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
    });
  }
 
- private void getData(){
+ /*private void getData(){
    String[] nomes       = {"REPÚBLICA DO CONGO", "INDONÉSIA", "CHILE", "CANADÁ", "REPÚBLICA TCHECA", "AUSTRÁLIA"};
    String[] continentes = {"ÁFRICA", "ÁSIA", "AMÉRICA DO SUL", "AMÉRICA DO NORTE", "EUROPA", "OCEANIA"};
    listPaises.clear();
@@ -60,11 +65,62 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
    }
 
    adapter.notifyDataSetChanged();
- }
+ }*/
 
  @Override
  public void onRefresh(){
-   getData();
+   getDataRetro();
  }
+
+ private void getDataRetro(){
+   HttpRetro.getCountryClient().getCountries().enqueue(new Callback<List<Country>>(){
+     public void onResponse(Call<List<Country>> call, Response<List<Country>> response){
+       if(response.isSuccessful()){
+         List<Country> countryBody = response.body();
+         listPaises.clear();
+
+         for(Country country : countryBody){
+           listPaises.add(country);
+         }
+
+         adapter.notifyDataSetChanged();
+       } else{
+         System.out.println(response.errorBody());
+       }
+
+       swiperefresh.setRefreshing(false);
+     }
+
+     @Override
+     public void onFailure(Call<List<Country>> call, Throwable t){
+       t.printStackTrace();
+     }
+   });
+ }
+
+ /*class CountryTask extends AsyncTask<Void, Void, List<Country>> {
+    @Override
+    protected void onPreExecute(){
+        super.onPreExecute();
+        swiperefresh.setRefreshing(true);
+    }
+
+    @Override
+    protected List<Country> doInBackground(Void... voids){
+        return Http.carregarJSONPaises();
+    }
+
+    @Override
+    protected void onPostExecute(List<Country> pais){
+        super.onPostExecute(pais);
+        if(pais != null){
+            listPaises.clear();
+            listPaises.addAll(pais);
+            adapter.notifyDataSetChanged();
+        }
+
+        swiperefresh.setRefreshing(false);
+    }
+}*/
 
 }
