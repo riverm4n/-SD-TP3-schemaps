@@ -10,17 +10,24 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import icomp.ufam.com.schemaps.Base.Country;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private Country country;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+
+        //pega ubs passada pela main
+        country = (Country) getIntent().getSerializableExtra("pais");
+
+        //inicializa mapFragment
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
 
@@ -36,11 +43,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        LatLng paislatlng = new LatLng(country.getLatitudeLongitude()[0], country.getLatitudeLongitude()[1]);
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //adiciona marcador e move a camera do mapa p ele
+        googleMap.addMarker(new MarkerOptions().position(paislatlng).title(country.nome));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(paislatlng, 12.0f));
+
     }
 }
